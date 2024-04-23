@@ -273,7 +273,6 @@ package com.example.party6.ui.login;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -307,8 +306,7 @@ public class LoginActivity extends AppCompatActivity {
         loginButton = findViewById(R.id.login);
         loadingProgressBar = findViewById(R.id.loading);
 
-        Context context = getApplicationContext();
-        loginRepository = LoginRepository.getInstance(new LoginDataSource(), context);
+        loginRepository = LoginRepository.getInstance(new LoginDataSource(), this);
 
         loginButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -335,8 +333,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 }
-
-
 
 
 
@@ -639,13 +635,17 @@ public class DBHelper extends SQLiteOpenHelper {
 
 File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/MainActivity.java
 // MainActivity.java
-
 package com.example.party6;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 public class MainActivity extends AppCompatActivity {
@@ -666,9 +666,51 @@ public class MainActivity extends AppCompatActivity {
         } else {
             welcomeText.setText("Добро пожаловать User");
         }
+
+        // Установка обработчика для поля фильтрации новостей
+        setupNewsFilter();
+    }
+
+    private void setupNewsFilter() {
+        EditText newsFilterEditText = findViewById(R.id.newsFilterEditText);
+        newsFilterEditText.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+                // Ничего не делаем
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                // Вызываем метод для фильтрации новостей по введенному тексту
+                filterNews(s.toString());
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+                // Ничего не делаем
+            }
+        });
+    }
+
+    private void filterNews(String searchText) {
+        // Получаем ссылки на блоки новостей
+        LinearLayout news1Layout = findViewById(R.id.news1Layout);
+        LinearLayout news2Layout = findViewById(R.id.news2Layout);
+
+        // Перебираем все блоки новостей и скрываем те, у которых название не содержит текст поиска
+        if (!news1Layout.toString().contains(searchText)) {
+            news1Layout.setVisibility(View.GONE);
+        } else {
+            news1Layout.setVisibility(View.VISIBLE);
+        }
+
+        if (!news2Layout.toString().contains(searchText)) {
+            news2Layout.setVisibility(View.GONE);
+        } else {
+            news2Layout.setVisibility(View.VISIBLE);
+        }
     }
 }
-
 
 
 
@@ -692,6 +734,7 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_login.xml
     android:layout_height="match_parent"
     android:paddingLeft="@dimen/activity_horizontal_margin"
     android:paddingTop="@dimen/activity_vertical_margin"
+    android:background="@drawable/news_background"
     android:paddingRight="@dimen/activity_horizontal_margin"
     android:paddingBottom="@dimen/activity_vertical_margin"
     tools:context=".ui.login.LoginActivity">
@@ -769,31 +812,60 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_login.xml
 
 
 File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
-<!-- activity_main.xml -->
-
+<?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:gravity="center"
     android:orientation="vertical"
     android:padding="16dp"
-    tools:context=".MainActivity">
+    android:background="@drawable/news_background"
+    android:visibility="visible"
+    tools:context=".MainActivity"
+    tools:visibility="visible">
+
 
     <TextView
         android:id="@+id/welcomeText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Добро пожаловать"
+        android:layout_marginBottom="16dp"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:visibility="gone" />
+        android:visibility="visible"
+        tools:visibility="visible" />
 
-    <Button
-        android:id="@+id/loginButton"
-        android:layout_width="wrap_content"
+    <EditText
+        android:id="@+id/newsFilterEditText"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:hint="поиск по названию"
+        android:textColorHint="#666666"
+        android:textSize="16sp" />
+
+    <LinearLayout
+        android:id="@+id/news1Layout"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Войти" />
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/white_background"
+        android:orientation="vertical"
+        android:padding="16dp">
+    </LinearLayout>
+
+
+    <LinearLayout
+        android:id="@+id/news2Layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/white_background"
+        android:orientation="vertical"
+        android:padding="16dp">
+    </LinearLayout>
 
 </LinearLayout>
 
@@ -904,3 +976,89 @@ dependencyResolutionManagement {
 }
 rootProject.name = "party6"
 include ':app'
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/AndroidManifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Party6"
+        tools:targetApi="31">
+
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="true"> <!-- Устанавливаем android:exported="true" для LoginActivity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Добавляем активность MainActivity -->
+        <activity android:name=".MainActivity" />
+
+    </application>
+
+</manifest>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/news_background.xml
+<!-- news_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#FF4081"
+        android:endColor="#00BCD4"
+        android:angle="135"/>
+    <corners android:radius="8dp"/>
+</shape>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/white_background.xml
+<!-- white_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFFFFF"/> <!-- Белый цвет фона -->
+    <corners android:radius="8dp"/> <!-- Закругленные углы -->
+</shape>

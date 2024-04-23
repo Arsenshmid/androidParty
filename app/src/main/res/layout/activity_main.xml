@@ -21,96 +21,36 @@
         android:visibility="visible"
         tools:visibility="visible" />
 
-    <!-- Поле ввода для фильтрации новостей -->
     <EditText
         android:id="@+id/newsFilterEditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="16dp"
         android:hint="поиск по названию"
         android:textColorHint="#666666"
         android:textSize="16sp" />
 
-    <!-- Блок новости 1 -->
     <LinearLayout
+        android:id="@+id/news1Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:background="@drawable/white_background"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Открытие SUBSIDIUM-23"
-            android:textColor="#000"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="Место: КФЕН"
-            android:textColor="#333333"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Дата: 27 марта (Четверг)"
-            android:textColor="#333333"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="18:00 ч"
-            android:textColor="#333333"
-            android:textSize="16sp" />
     </LinearLayout>
 
 
     <LinearLayout
+        android:id="@+id/news2Layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"
         android:background="@drawable/white_background"
         android:orientation="vertical"
         android:padding="16dp">
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="8dp"
-            android:text="Посвящение первокурсников КИТ"
-            android:textColor="#000"
-            android:textSize="20sp"
-            android:textStyle="bold" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="4dp"
-            android:text="Место: КИТ"
-            android:textColor="#333333"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Дата: 27 сентября (Суббота)"
-            android:textColor="#333333"
-            android:textSize="16sp" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="17:00 ч"
-            android:textColor="#333333"
-            android:textSize="16sp" />
     </LinearLayout>
 
 </LinearLayout>

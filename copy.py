@@ -22,7 +22,9 @@ files = [
 'C:/Users/apce1/Desktop/party6/app/build.gradle',
 'C:/Users/apce1/Desktop/party6/settings.gradle',
 'C:/Users/apce1/Desktop/party6/app/src/main/AndroidManifest.xml',
-
+'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/news_background.xml',
+'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/white_background.xml',
+'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/NewsItem.java',
 ]
 
 # Открываем файл для записи в кодировке UTF-8
