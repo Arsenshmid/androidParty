@@ -1,0 +1,6 @@
+<!-- white_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFFFFF"/> <!-- Белый цвет фона -->
+    <corners android:radius="8dp"/> <!-- Закругленные углы -->
+</shape>
