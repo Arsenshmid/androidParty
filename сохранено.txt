@@ -1,0 +1,906 @@
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/model/LoggedInUser.java
+package com.example.party6.data.model;
+
+/**
+ * Data class that captures user information for logged in users retrieved from LoginRepository
+ */
+public class LoggedInUser {
+
+    private String userId;
+    private String displayName;
+
+    public LoggedInUser(String userId, String displayName) {
+        this.userId = userId;
+        this.displayName = displayName;
+    }
+
+    public String getUserId() {
+        return userId;
+    }
+
+    public String getDisplayName() {
+        return displayName;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/model/LoginActivity.java
+package com.example.party6.data.model;
+
+public class LoginActivity {
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/LoginDataSource.java
+package com.example.party6.data;
+
+import com.example.party6.data.model.LoggedInUser;
+
+import java.io.IOException;
+
+public class LoginDataSource {
+
+    public Result<LoggedInUser> login(String username, String password) {
+        try {
+            if (username.equals("admin") || username.equals("user")) {
+                if (password.equals("pass")) {
+                    LoggedInUser loggedInUser =
+                            new LoggedInUser(java.util.UUID.randomUUID().toString(), username);
+                    return new Result.Success<>(loggedInUser);
+                } else {
+                    return new Result.Error(new Exception("Неправильный пароль"));
+                }
+            } else {
+                return new Result.Error(new Exception("Неправильное имя пользователя"));
+            }
+        } catch (Exception e) {
+            return new Result.Error(new IOException("Ошибка входа", e));
+        }
+    }
+
+    public void logout() {
+        // Not implemented
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/LoginRepository.java
+// LoginRepository.java
+
+package com.example.party6.data;
+
+import com.example.party6.data.model.LoggedInUser;
+import android.content.Context;
+
+/**
+ * Class that requests authentication and user information from the remote data source and
+ * maintains an in-memory cache of login status and user credentials information.
+ */
+public class LoginRepository {
+
+    private static volatile LoginRepository instance;
+
+    private LoginDataSource dataSource;
+
+    private LoggedInUser user = null;
+
+    private Context context; // Добавляем контекст для DBHelper
+
+    private LoginRepository(LoginDataSource dataSource, Context context) {
+        this.dataSource = dataSource;
+        this.context = context; // Инициализируем контекст
+    }
+
+    public static LoginRepository getInstance(LoginDataSource dataSource, Context context) {
+        if (instance == null) {
+            instance = new LoginRepository(dataSource, context);
+        }
+        return instance;
+    }
+
+    public boolean isLoggedIn() {
+        return user != null;
+    }
+
+    public void logout() {
+        user = null;
+        dataSource.logout();
+    }
+
+    private void setLoggedInUser(LoggedInUser user) {
+        this.user = user;
+    }
+
+    public Result<LoggedInUser> login(String username, String password) {
+        Result<LoggedInUser> result = dataSource.login(username, password);
+        if (result instanceof Result.Success) {
+            setLoggedInUser(((Result.Success<LoggedInUser>) result).getData());
+        }
+        return result;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/Result.java
+package com.example.party6.data;
+
+/**
+ * A generic class that holds a result success w/ data or an error exception.
+ */
+public class Result<T> {
+    // hide the private constructor to limit subclass types (Success, Error)
+    private Result() {
+    }
+
+    @Override
+    public String toString() {
+        if (this instanceof Result.Success) {
+            Result.Success success = (Result.Success) this;
+            return "Success[data=" + success.getData().toString() + "]";
+        } else if (this instanceof Result.Error) {
+            Result.Error error = (Result.Error) this;
+            return "Error[exception=" + error.getError().toString() + "]";
+        }
+        return "";
+    }
+
+    // Success sub-class
+    public final static class Success<T> extends Result {
+        private T data;
+
+        public Success(T data) {
+            this.data = data;
+        }
+
+        public T getData() {
+            return this.data;
+        }
+    }
+
+    // Error sub-class
+    public final static class Error extends Result {
+        private Exception error;
+
+        public Error(Exception error) {
+            this.error = error;
+        }
+
+        public Exception getError() {
+            return this.error;
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoggedInUserView.java
+package com.example.party6.ui.login;
+
+/**
+ * Class exposing authenticated user details to the UI.
+ */
+class LoggedInUserView {
+    private String displayName;
+    //... other data fields that may be accessible to the UI
+
+    LoggedInUserView(String displayName) {
+        this.displayName = displayName;
+    }
+
+    String getDisplayName() {
+        return displayName;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginActivity.java
+package com.example.party6.ui.login;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Context;
+import android.content.Intent;
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ProgressBar;
+import android.widget.Toast;
+
+import com.example.party6.MainActivity;
+import com.example.party6.R;
+import com.example.party6.data.LoginDataSource;
+import com.example.party6.data.LoginRepository;
+import com.example.party6.data.Result;
+import com.example.party6.data.model.LoggedInUser;
+
+public class LoginActivity extends AppCompatActivity {
+
+    private EditText usernameEditText, passwordEditText;
+    private Button loginButton;
+    private ProgressBar loadingProgressBar;
+
+    private LoginRepository loginRepository;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_login);
+
+        usernameEditText = findViewById(R.id.username);
+        passwordEditText = findViewById(R.id.password);
+        loginButton = findViewById(R.id.login);
+        loadingProgressBar = findViewById(R.id.loading);
+
+        Context context = getApplicationContext();
+        loginRepository = LoginRepository.getInstance(new LoginDataSource(), context);
+
+        loginButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String username = usernameEditText.getText().toString();
+                String password = passwordEditText.getText().toString();
+                login(username, password);
+            }
+        });
+    }
+
+    private void login(String username, String password) {
+        Result<LoggedInUser> result = loginRepository.login(username, password);
+        if (result instanceof Result.Success) {
+            LoggedInUser loggedInUser = ((Result.Success<LoggedInUser>) result).getData();
+            String userType = loggedInUser.getDisplayName().equals("admin") ? "admin" : "user";
+            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            intent.putExtra("userType", userType);
+            startActivity(intent);
+            finish(); // Закрываем текущую активность, чтобы при возвращении на нее пользователь не мог вернуться к форме входа
+        } else if (result instanceof Result.Error) {
+            Exception error = ((Result.Error) result).getError();
+            Toast.makeText(this, "Ошибка входа в систему: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginFormState.java
+package com.example.party6.ui.login;
+
+import androidx.annotation.Nullable;
+
+/**
+ * Data validation state of the login form.
+ */
+class LoginFormState {
+    @Nullable
+    private Integer usernameError;
+    @Nullable
+    private Integer passwordError;
+    private boolean isDataValid;
+
+    LoginFormState(@Nullable Integer usernameError, @Nullable Integer passwordError) {
+        this.usernameError = usernameError;
+        this.passwordError = passwordError;
+        this.isDataValid = false;
+    }
+
+    LoginFormState(boolean isDataValid) {
+        this.usernameError = null;
+        this.passwordError = null;
+        this.isDataValid = isDataValid;
+    }
+
+    @Nullable
+    Integer getUsernameError() {
+        return usernameError;
+    }
+
+    @Nullable
+    Integer getPasswordError() {
+        return passwordError;
+    }
+
+    boolean isDataValid() {
+        return isDataValid;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginResult.java
+package com.example.party6.ui.login;
+
+import androidx.annotation.Nullable;
+
+/**
+ * Authentication result : success (user details) or error message.
+ */
+class LoginResult {
+    @Nullable
+    private LoggedInUserView success;
+    @Nullable
+    private Integer error;
+
+    LoginResult(@Nullable Integer error) {
+        this.error = error;
+    }
+
+    LoginResult(@Nullable LoggedInUserView success) {
+        this.success = success;
+    }
+
+    @Nullable
+    LoggedInUserView getSuccess() {
+        return success;
+    }
+
+    @Nullable
+    Integer getError() {
+        return error;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginViewModel.java
+package com.example.party6.ui.login;
+
+import androidx.lifecycle.LiveData;
+import androidx.lifecycle.MutableLiveData;
+import androidx.lifecycle.ViewModel;
+
+import android.util.Patterns;
+
+import com.example.party6.data.LoginRepository;
+import com.example.party6.data.Result;
+import com.example.party6.data.model.LoggedInUser;
+import com.example.party6.R;
+
+public class LoginViewModel extends ViewModel {
+
+    private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
+    private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
+    private LoginRepository loginRepository;
+
+    LoginViewModel(LoginRepository loginRepository) {
+        this.loginRepository = loginRepository;
+    }
+
+    LiveData<LoginFormState> getLoginFormState() {
+        return loginFormState;
+    }
+
+    LiveData<LoginResult> getLoginResult() {
+        return loginResult;
+    }
+
+    public void login(String username, String password) {
+        // can be launched in a separate asynchronous job
+        Result<LoggedInUser> result = loginRepository.login(username, password);
+
+        if (result instanceof Result.Success) {
+            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
+            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
+        } else {
+            loginResult.setValue(new LoginResult(R.string.login_failed));
+        }
+    }
+
+    public void loginDataChanged(String username, String password) {
+        if (!isUserNameValid(username)) {
+            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
+        } else if (!isPasswordValid(password)) {
+            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
+        } else {
+            loginFormState.setValue(new LoginFormState(true));
+        }
+    }
+
+    // A placeholder username validation check
+    private boolean isUserNameValid(String username) {
+        if (username == null) {
+            return false;
+        }
+        if (username.contains("@")) {
+            return Patterns.EMAIL_ADDRESS.matcher(username).matches();
+        } else {
+            return !username.trim().isEmpty();
+        }
+    }
+
+    // A placeholder password validation check
+    private boolean isPasswordValid(String password) {
+        return password != null && password.trim().length() > 5;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginViewModelFactory.java
+package com.example.party6.ui.login;
+
+import android.content.Context;
+
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.annotation.NonNull;
+
+import com.example.party6.data.LoginDataSource;
+import com.example.party6.data.LoginRepository;
+
+/**
+ * ViewModel provider factory to instantiate LoginViewModel.
+ * Required given LoginViewModel has a non-empty constructor
+ */
+public class LoginViewModelFactory implements ViewModelProvider.Factory {
+
+    private final Context context; // Добавлено поле для хранения контекста
+
+    // Конструктор для получения контекста
+    public LoginViewModelFactory(Context context) {
+        this.context = context;
+    }
+
+    @NonNull
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
+        if (modelClass.isAssignableFrom(LoginViewModel.class)) {
+            // Передаем контекст вместе с LoginDataSource
+            return (T) new LoginViewModel(LoginRepository.getInstance(new LoginDataSource(), context));
+        } else {
+            throw new IllegalArgumentException("Unknown ViewModel class");
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/DBHelper.java
+// DBHelper.java
+
+package com.example.party6;
+
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+
+public class DBHelper extends SQLiteOpenHelper {
+    private static final String DATABASE_NAME = "party6.db";
+    private static final int DATABASE_VERSION = 1;
+
+    public DBHelper(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    @Override
+    public void onCreate(SQLiteDatabase db) {
+        String sql = "CREATE TABLE users (" +
+                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                "username TEXT," +
+                "password TEXT)";
+        db.execSQL(sql);
+        // Вставляем тестовых пользователей
+        db.execSQL("INSERT INTO users (username, password) VALUES ('admin', 'password')");
+        db.execSQL("INSERT INTO users (username, password) VALUES ('user', 'password')");
+    }
+
+    @Override
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        db.execSQL("DROP TABLE IF EXISTS users");
+        onCreate(db);
+    }
+
+    public boolean checkUser(String username, String password) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username=? AND password=?", new String[]{username, password});
+        boolean userExists = cursor.getCount() > 0;
+        cursor.close();
+        return userExists;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/MainActivity.java
+// MainActivity.java
+
+package com.example.party6;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.content.Intent;
+import android.os.Bundle;
+import android.widget.TextView;
+
+public class MainActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        // Получение данных о пользователе из предыдущей активности
+        Intent intent = getIntent();
+        String userType = intent.getStringExtra("userType");
+
+        // Отображение приветствия в зависимости от типа пользователя
+        TextView welcomeText = findViewById(R.id.welcomeText);
+        if (userType != null && userType.equals("admin")) {
+            welcomeText.setText("Добро пожаловать Admin");
+        } else {
+            welcomeText.setText("Добро пожаловать User");
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_login.xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:paddingLeft="@dimen/activity_horizontal_margin"
+    android:paddingTop="@dimen/activity_vertical_margin"
+    android:paddingRight="@dimen/activity_horizontal_margin"
+    android:paddingBottom="@dimen/activity_vertical_margin"
+    tools:context=".ui.login.LoginActivity">
+
+    <EditText
+        android:id="@+id/username"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginTop="96dp"
+        android:hint="@string/prompt_email"
+        android:inputType="textEmailAddress"
+        android:selectAllOnFocus="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:minHeight="48dp"
+        android:layout_marginTop="8dp"
+        android:hint="@string/prompt_password"
+        android:imeActionLabel="@string/action_sign_in_short"
+        android:imeOptions="actionDone"
+        android:inputType="textPassword"
+        android:selectAllOnFocus="true"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/username" />
+
+
+    <Button
+        android:id="@+id/login"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="start"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="64dp"
+        android:enabled="true"
+        android:text="@string/action_sign_in"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/password"
+        app:layout_constraintVertical_bias="0.2" />
+
+    <ProgressBar
+        android:id="@+id/loading"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="64dp"
+        android:layout_marginBottom="64dp"
+        android:visibility="gone"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="@+id/password"
+        app:layout_constraintStart_toStartOf="@+id/password"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.3" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
+<!-- activity_main.xml -->
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center"
+    android:orientation="vertical"
+    android:padding="16dp"
+    tools:context=".MainActivity">
+
+    <TextView
+        android:id="@+id/welcomeText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Добро пожаловать"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:visibility="gone" />
+
+    <Button
+        android:id="@+id/loginButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Войти" />
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/build.gradle
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    id 'com.android.application' version '7.4.1' apply false
+    id 'com.android.library' version '7.4.1' apply false
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/build.gradle
+plugins {
+    id 'com.android.application'
+}
+
+android {
+    namespace 'com.example.party6'
+    compileSdkVersion 34
+
+    defaultConfig {
+        applicationId "com.example.party6"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.annotation:annotation:1.7.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.sqlite:sqlite:2.1.0'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/settings.gradle
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+rootProject.name = "party6"
+include ':app'
