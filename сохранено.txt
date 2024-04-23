@@ -670,16 +670,22 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/MainActivity.java
-// MainActivity.java
-package com.example.party6;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.party6;// В MainActivity.java
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.party6.DBHelper;
+import com.example.party6.NewsItem;
+import com.example.party6.ProfileActivity;
 
 import java.util.List;
 
@@ -698,6 +704,7 @@ public class MainActivity extends AppCompatActivity {
         TextView welcomeText = findViewById(R.id.welcomeText);
         if (userType != null && userType.equals("admin")) {
             welcomeText.setText("Добро пожаловать Admin");
+            setupAdminFeatures(); // Добавляем функционал для администратора
         } else {
             welcomeText.setText("Добро пожаловать User");
         }
@@ -707,6 +714,30 @@ public class MainActivity extends AppCompatActivity {
 
         // Отображаем новости в блоках новостей
         displayNews(newsList);
+
+        // Обработка нажатия на кнопку "Кнопка 5"
+        Button button5 = findViewById(R.id.button5);
+        button5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openProfileActivity();
+            }
+        });
+    }
+
+    private void setupAdminFeatures() {
+        Button addEventButton = findViewById(R.id.addEventButton);
+        addEventButton.setVisibility(View.VISIBLE); // Показываем кнопку добавления мероприятий
+        addEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Здесь можно добавить логику для добавления нового мероприятия в базу данных
+                Toast.makeText(MainActivity.this, "Добавление нового мероприятия", Toast.LENGTH_SHORT).show();
+                // После добавления мероприятия обновляем список новостей
+                List<NewsItem> updatedNewsList = getNewsFromDatabase();
+                displayNews(updatedNewsList);
+            }
+        });
     }
 
     private List<NewsItem> getNewsFromDatabase() {
@@ -718,6 +749,10 @@ public class MainActivity extends AppCompatActivity {
         // Получаем ссылки на блоки новостей
         LinearLayout news1Layout = findViewById(R.id.news1Layout);
         LinearLayout news2Layout = findViewById(R.id.news2Layout);
+
+        // Очищаем предыдущие новости
+        news1Layout.removeAllViews();
+        news2Layout.removeAllViews();
 
         // Перебираем список новостей и отображаем их в блоках новостей
         for (int i = 0; i < newsList.size(); i++) {
@@ -735,7 +770,14 @@ public class MainActivity extends AppCompatActivity {
             }
         }
     }
+
+    // Метод для открытия активности профиля
+    private void openProfileActivity() {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
+    }
 }
+
 
 
 
@@ -889,8 +931,67 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
         android:orientation="vertical"
         android:padding="16dp">
     </LinearLayout>
+    <!-- Добавляем контейнер для кнопок в нижней части экрана -->
+    <LinearLayout
+        android:id="@+id/bottomButtonContainer"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="center">
 
+        <!-- Первая кнопка -->
+        <Button
+            android:id="@+id/button1"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Кнопка 1" />
+
+        <!-- Вторая кнопка -->
+        <Button
+            android:id="@+id/button2"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Кнопка 2" />
+
+        <!-- Третья кнопка -->
+        <Button
+            android:id="@+id/button3"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Кнопка 3" />
+
+        <!-- Четвертая кнопка -->
+        <Button
+            android:id="@+id/button4"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Кнопка 4" />
+
+        <!-- Пятая кнопка -->
+        <Button
+            android:id="@+id/button5"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Кнопка 5" />
+
+        <!-- Кнопка для добавления мероприятий (для администратора) -->
+        <Button
+            android:id="@+id/addEventButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Добавить мероприятие"
+            android:visibility="gone" />
+
+    </LinearLayout>
 </LinearLayout>
+
 
 
 
@@ -1128,5 +1229,200 @@ public class NewsItem {
 
     public void setDate(String date) {
         this.date = date;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/round_button.xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/colorPrimary"/>
+    <corners android:radius="25dp"/>
+</shape>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_add_news.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/newsTitleEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Заголовок новости"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/newsPlaceEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Место проведения"
+        android:layout_below="@id/newsTitleEditText"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/newsDateEditText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Дата проведения"
+        android:layout_below="@id/newsPlaceEditText"
+        android:layout_marginBottom="16dp"/>
+
+    <Button
+        android:id="@+id/addNewsButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/newsDateEditText"
+        android:layout_alignParentEnd="true"
+        android:text="Добавить новость"/>
+</RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_profile.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/news_background"
+    tools:context=".ProfileActivity">
+
+    <ImageView
+        android:id="@+id/profileImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/profile_image"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"/>
+
+    <TextView
+        android:id="@+id/profileName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ФИО: Иванова Карина Васильевна"
+        android:textSize="18sp"
+        android:layout_below="@id/profileImage"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/profileDOB"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Дата рождения: 9 декабря, 2004 года"
+        android:textSize="18sp"
+        android:layout_below="@id/profileName"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"/>
+
+    <TextView
+        android:id="@+id/profileEquipment"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Аппаратура: штатив"
+        android:textSize="18sp"
+        android:layout_below="@id/profileDOB"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"/>
+
+    <Button
+        android:id="@+id/backButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Назад"
+        android:layout_below="@id/profileEquipment"
+        android:layout_marginTop="32dp"
+        android:layout_centerHorizontal="true"/>
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/AddNewsActivity.java
+package com.example.party6;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Bundle;
+
+public class AddNewsActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_add_news);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ProfileActivity.java
+package com.example.party6;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
+public class ProfileActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile);
     }
 }

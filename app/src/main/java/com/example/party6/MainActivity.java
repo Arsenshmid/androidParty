@@ -1,13 +1,19 @@
-// MainActivity.java
-package com.example.party6;
-
-import androidx.appcompat.app.AppCompatActivity;
+package com.example.party6;// В MainActivity.java
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+import com.example.party6.DBHelper;
+import com.example.party6.NewsItem;
+import com.example.party6.ProfileActivity;
 
 import java.util.List;
 
@@ -26,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         TextView welcomeText = findViewById(R.id.welcomeText);
         if (userType != null && userType.equals("admin")) {
             welcomeText.setText("Добро пожаловать Admin");
+            setupAdminFeatures(); // Добавляем функционал для администратора
         } else {
             welcomeText.setText("Добро пожаловать User");
         }
@@ -35,6 +42,30 @@ public class MainActivity extends AppCompatActivity {
 
         // Отображаем новости в блоках новостей
         displayNews(newsList);
+
+        // Обработка нажатия на кнопку "Кнопка 5"
+        Button button5 = findViewById(R.id.button5);
+        button5.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openProfileActivity();
+            }
+        });
+    }
+
+    private void setupAdminFeatures() {
+        Button addEventButton = findViewById(R.id.addEventButton);
+        addEventButton.setVisibility(View.VISIBLE); // Показываем кнопку добавления мероприятий
+        addEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Здесь можно добавить логику для добавления нового мероприятия в базу данных
+                Toast.makeText(MainActivity.this, "Добавление нового мероприятия", Toast.LENGTH_SHORT).show();
+                // После добавления мероприятия обновляем список новостей
+                List<NewsItem> updatedNewsList = getNewsFromDatabase();
+                displayNews(updatedNewsList);
+            }
+        });
     }
 
     private List<NewsItem> getNewsFromDatabase() {
@@ -46,6 +77,10 @@ public class MainActivity extends AppCompatActivity {
         // Получаем ссылки на блоки новостей
         LinearLayout news1Layout = findViewById(R.id.news1Layout);
         LinearLayout news2Layout = findViewById(R.id.news2Layout);
+
+        // Очищаем предыдущие новости
+        news1Layout.removeAllViews();
+        news2Layout.removeAllViews();
 
         // Перебираем список новостей и отображаем их в блоках новостей
         for (int i = 0; i < newsList.size(); i++) {
@@ -62,5 +97,11 @@ public class MainActivity extends AppCompatActivity {
                 news2Layout.addView(newsTextView);
             }
         }
+    }
+
+    // Метод для открытия активности профиля
+    private void openProfileActivity() {
+        Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
     }
 }

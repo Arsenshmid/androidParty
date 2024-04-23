@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- activity_main.xml -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -53,52 +52,63 @@
         android:orientation="vertical"
         android:padding="16dp">
     </LinearLayout>
-
-    <!-- Добавлены пять кнопок, расположенные горизонтально и стилизованные -->
+    <!-- Добавляем контейнер для кнопок в нижней части экрана -->
     <LinearLayout
+        android:id="@+id/bottomButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="horizontal">
+        android:layout_alignParentBottom="true"
+        android:orientation="horizontal"
+        android:gravity="center">
 
+        <!-- Первая кнопка -->
         <Button
             android:id="@+id/button1"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="1"
-            android:background="@drawable/button_background" />
+            android:text="Кнопка 1" />
 
+        <!-- Вторая кнопка -->
         <Button
             android:id="@+id/button2"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="2"
-            android:background="@drawable/button_background" />
+            android:text="Кнопка 2" />
 
+        <!-- Третья кнопка -->
         <Button
             android:id="@+id/button3"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="3"
-            android:background="@drawable/button_background" />
+            android:text="Кнопка 3" />
 
+        <!-- Четвертая кнопка -->
         <Button
             android:id="@+id/button4"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="4"
-            android:background="@drawable/button_background" />
+            android:text="Кнопка 4" />
 
+        <!-- Пятая кнопка -->
         <Button
             android:id="@+id/button5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="5"
-            android:background="@drawable/button_background" />
-    </LinearLayout>
+            android:text="Кнопка 5" />
 
+        <!-- Кнопка для добавления мероприятий (для администратора) -->
+        <Button
+            android:id="@+id/addEventButton"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Добавить мероприятие"
+            android:visibility="gone" />
+
+    </LinearLayout>
 </LinearLayout>

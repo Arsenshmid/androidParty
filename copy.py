@@ -25,6 +25,12 @@ files = [
 'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/news_background.xml',
 'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/white_background.xml',
 'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/NewsItem.java',
+'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/round_button.xml',
+'C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_add_news.xml',
+'C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_profile.xml',
+'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/AddNewsActivity.java',
+'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ProfileActivity.java',
+
 ]
 
 # Открываем файл для записи в кодировке UTF-8
