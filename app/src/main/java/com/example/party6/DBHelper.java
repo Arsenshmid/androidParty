@@ -6,21 +6,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.party6.NewsItem;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "party6_db";
+    private static final String DATABASE_NAME = "PartyDB";
     private static final int DATABASE_VERSION = 1;
 
-    private static final String TABLE_NAME = "events";
-    private static final String COLUMN_ID = "id";
-    private static final String COLUMN_TITLE = "title";
-    private static final String COLUMN_PLACE = "place";
-    private static final String COLUMN_DATE = "date";
+    // Таблица событий
+    private static final String TABLE_EVENTS = "events";
+    private static final String KEY_ID = "id";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_PLACE = "place";
+    private static final String KEY_DATE = "date";
+
+    // Таблица аппаратуры
+    private static final String TABLE_EQUIPMENT = "equipment";
+    private static final String KEY_EQUIPMENT_ID = "id";
+    private static final String KEY_EQUIPMENT_NAME = "name";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -28,62 +32,70 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_TITLE + " TEXT,"
-                + COLUMN_PLACE + " TEXT,"
-                + COLUMN_DATE + " TEXT"
-                + ")";
+        // Создание таблицы событий
+        String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TITLE + " TEXT,"
+                + KEY_PLACE + " TEXT," + KEY_DATE + " TEXT" + ")";
         db.execSQL(CREATE_EVENTS_TABLE);
+
+        // Создание таблицы аппаратуры
+        String CREATE_EQUIPMENT_TABLE = "CREATE TABLE " + TABLE_EQUIPMENT + "("
+                + KEY_EQUIPMENT_ID + " INTEGER PRIMARY KEY," + KEY_EQUIPMENT_NAME + " TEXT" + ")";
+        db.execSQL(CREATE_EQUIPMENT_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        // Удаление старых таблиц и создание новых при обновлении БД
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EQUIPMENT);
         onCreate(db);
     }
 
-    public long addEvent(String title, String place, String date) {
+    // Добавление события в БД
+    public void addEvent(NewsItem newsItem) {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues values = new ContentValues();
-        values.put(COLUMN_TITLE, title);
-        values.put(COLUMN_PLACE, place);
-        values.put(COLUMN_DATE, date);
-        long result = db.insert(TABLE_NAME, null, values);
+        values.put(KEY_TITLE, newsItem.getTitle());
+        values.put(KEY_PLACE, newsItem.getPlace());
+        values.put(KEY_DATE, newsItem.getDate());
+
+        db.insert(TABLE_EVENTS, null, values);
         db.close();
-        return result;
     }
 
+    // Получение всех событий из БД
     public List<NewsItem> getAllEvents() {
-        List<NewsItem> eventsList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_NAME;
+        List<NewsItem> eventList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_EVENTS;
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
-                NewsItem event = new NewsItem();
-                int titleIndex = cursor.getColumnIndex(COLUMN_TITLE);
-                int placeIndex = cursor.getColumnIndex(COLUMN_PLACE);
-                int dateIndex = cursor.getColumnIndex(COLUMN_DATE);
-
-                if (titleIndex != -1) {
-                    event.setTitle(cursor.getString(titleIndex));
-                }
-                if (placeIndex != -1) {
-                    event.setPlace(cursor.getString(placeIndex));
-                }
-                if (dateIndex != -1) {
-                    event.setDate(cursor.getString(dateIndex));
-                }
-
-                eventsList.add(event);
+                NewsItem newsItem = new NewsItem();
+                newsItem.setTitle(cursor.getString(1));
+                newsItem.setPlace(cursor.getString(2));
+                newsItem.setDate(cursor.getString(3));
+                eventList.add(newsItem);
             } while (cursor.moveToNext());
         }
-        if (cursor != null) {
-            cursor.close();
-        }
+
+        cursor.close();
         db.close();
-        return eventsList;
+        return eventList;
+    }
+
+    // Добавление аппаратуры в БД
+    public void addEquipment(String equipment) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_EQUIPMENT_NAME, equipment);
+
+        db.insert(TABLE_EQUIPMENT, null, values);
+        db.close();
     }
 }

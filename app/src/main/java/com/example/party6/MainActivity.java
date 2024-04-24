@@ -55,6 +55,15 @@ public class MainActivity extends AppCompatActivity {
                 openAddEventActivity();
             }
         });
+
+        // Обработка нажатия на кнопку "Дневник"
+        Button diaryButton = findViewById(R.id.diaryButton);
+        diaryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openEquipmentSelectionDialog();
+            }
+        });
     }
 
     private void setupAdminFeatures() {
@@ -64,19 +73,14 @@ public class MainActivity extends AppCompatActivity {
 
     private List<NewsItem> getNewsFromDatabase() {
         DBHelper dbHelper = new DBHelper(this);
-        return dbHelper.getAllEvents(); // Corrected method call to getAllEvents()
+        return dbHelper.getAllEvents();
     }
 
     private void displayNews(List<NewsItem> newsList) {
-        // Получаем ссылки на блоки новостей
         LinearLayout news1Layout = findViewById(R.id.news1Layout);
         LinearLayout news2Layout = findViewById(R.id.news2Layout);
-
-        // Очищаем предыдущие новости
         news1Layout.removeAllViews();
         news2Layout.removeAllViews();
-
-        // Перебираем список новостей и отображаем их в блоках новостей
         for (int i = 0; i < newsList.size(); i++) {
             NewsItem newsItem = newsList.get(i);
             TextView newsTextView = new TextView(this);
@@ -93,15 +97,25 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Метод для открытия активности профиля
     public void openProfileActivity() {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 
-    // Метод для открытия активности добавления мероприятия
     public void openAddEventActivity() {
         Intent intent = new Intent(this, AddEventActivity.class);
         startActivity(intent);
+    }
+
+    public void openEquipmentSelectionDialog() {
+        // Открываем диалог выбора аппаратуры
+        Intent intent = new Intent(this, EquipmentSelectionActivity.class);
+        startActivity(intent);
+    }
+
+    public void saveSelectedEquipment(String equipment) {
+        // Сохраняем выбранную аппаратуру в базу данных
+        DBHelper dbHelper = new DBHelper(this);
+        dbHelper.addEquipment(equipment);
     }
 }

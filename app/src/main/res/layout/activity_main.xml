@@ -52,7 +52,6 @@
         android:padding="16dp">
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/bottomButtonContainer"
         android:layout_width="match_parent"
@@ -100,4 +99,25 @@
             android:layout_marginBottom="8dp"/>
 
     </LinearLayout>
+
+    <!-- Кнопка Profile -->
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_button"
+        android:text="Profile"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center_horizontal" />
+
+    <!-- Кнопка Добавления мероприятия -->
+    <Button
+        android:id="@+id/addEventButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_button"
+        android:text="+"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>

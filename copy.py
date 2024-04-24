@@ -29,6 +29,8 @@ files = [
 'C:/Users/apce1/Desktop/party7/androidParty/build.gradle',
 'C:/Users/apce1/Desktop/party7/androidParty/app/build.gradle',
 'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_diary.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/EquipmentSelectionActivity.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_equipment_selection.xml',
 
 
 
