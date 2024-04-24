@@ -10,9 +10,6 @@ import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.party6.DBHelper;
-import com.example.party6.NewsItem;
-
 import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
@@ -67,7 +64,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<NewsItem> getNewsFromDatabase() {
         DBHelper dbHelper = new DBHelper(this);
-        return dbHelper.getAllNews();
+        return dbHelper.getAllEvents(); // Corrected method call to getAllEvents()
     }
 
     private void displayNews(List<NewsItem> newsList) {
