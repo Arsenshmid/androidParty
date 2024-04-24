@@ -3,33 +3,37 @@ import pyperclip
 
 # Список файлов для обработки
 files = [
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/model/LoggedInUser.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/model/LoginActivity.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/LoginDataSource.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/LoginRepository.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/Result.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoggedInUserView.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginActivity.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginFormState.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginResult.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginViewModel.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginViewModelFactory.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/DBHelper.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/MainActivity.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_login.xml',
-'C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml',
-'C:/Users/apce1/Desktop/party6/build.gradle',
-'C:/Users/apce1/Desktop/party6/app/build.gradle',
-'C:/Users/apce1/Desktop/party6/settings.gradle',
-'C:/Users/apce1/Desktop/party6/app/src/main/AndroidManifest.xml',
-'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/news_background.xml',
-'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/white_background.xml',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/NewsItem.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/round_button.xml',
-'C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_add_news.xml',
-'C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_profile.xml',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/AddNewsActivity.java',
-'C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ProfileActivity.java',
+
+
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/model/LoggedInUser.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/model/LoginActivity.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/LoginDataSource.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/LoginRepository.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/Result.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/AddEventActivity.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/DBHelper.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/MainActivity.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/NewsItem.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/ProfileActivity.java',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/button_background.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/news_background.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/round_button.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/white_background.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_add_event.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_login.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_main.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_profile.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/values/colors.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/values/strings.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/AndroidManifest.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/build.gradle',
+'C:/Users/apce1/Desktop/party7/androidParty/app/build.gradle',
+
+
+
+
+
+
 
 ]
 

@@ -11,7 +11,7 @@
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/model/LoggedInUser.java
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/model/LoggedInUser.java
 package com.example.party6.data.model;
 
 /**
@@ -47,7 +47,7 @@ public class LoggedInUser {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/model/LoginActivity.java
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/model/LoginActivity.java
 package com.example.party6.data.model;
 
 public class LoginActivity {
@@ -65,7 +65,7 @@ public class LoginActivity {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/LoginDataSource.java
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/LoginDataSource.java
 package com.example.party6.data;
 
 import com.example.party6.data.model.LoggedInUser;
@@ -109,7 +109,7 @@ public class LoginDataSource {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/LoginRepository.java
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/LoginRepository.java
 // LoginRepository.java
 
 package com.example.party6.data;
@@ -177,7 +177,7 @@ public class LoginRepository {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/data/Result.java
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/Result.java
 package com.example.party6.data;
 
 /**
@@ -238,100 +238,52 @@ public class Result<T> {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoggedInUserView.java
-package com.example.party6.ui.login;
-
-/**
- * Class exposing authenticated user details to the UI.
- */
-class LoggedInUserView {
-    private String displayName;
-    //... other data fields that may be accessible to the UI
-
-    LoggedInUserView(String displayName) {
-        this.displayName = displayName;
-    }
-
-    String getDisplayName() {
-        return displayName;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginActivity.java
-package com.example.party6.ui.login;
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/AddEventActivity.java
+package com.example.party6;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ProgressBar;
 import android.widget.Toast;
 
-import com.example.party6.MainActivity;
-import com.example.party6.R;
-import com.example.party6.data.LoginDataSource;
-import com.example.party6.data.LoginRepository;
-import com.example.party6.data.Result;
-import com.example.party6.data.model.LoggedInUser;
-
-public class LoginActivity extends AppCompatActivity {
-
-    private EditText usernameEditText, passwordEditText;
-    private Button loginButton;
-    private ProgressBar loadingProgressBar;
-
-    private LoginRepository loginRepository;
+public class AddEventActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
+        setContentView(R.layout.activity_add_event);
 
-        usernameEditText = findViewById(R.id.username);
-        passwordEditText = findViewById(R.id.password);
-        loginButton = findViewById(R.id.login);
-        loadingProgressBar = findViewById(R.id.loading);
-
-        loginRepository = LoginRepository.getInstance(new LoginDataSource(), this);
-
-        loginButton.setOnClickListener(new View.OnClickListener() {
+        Button addEventButton = findViewById(R.id.addEventButtonAddActivity);
+        addEventButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String username = usernameEditText.getText().toString();
-                String password = passwordEditText.getText().toString();
-                login(username, password);
+                // Получаем данные из полей ввода
+                String title = ((EditText) findViewById(R.id.eventTitleEditText)).getText().toString();
+                String place = ((EditText) findViewById(R.id.eventPlaceEditText)).getText().toString();
+                String date = ((EditText) findViewById(R.id.eventDateEditText)).getText().toString();
+
+                // Создаем экземпляр DBHelper для работы с базой данных
+                DBHelper dbHelper = new DBHelper(AddEventActivity.this);
+
+                // Добавляем новое мероприятие в базу данных
+                long result = dbHelper.addEvent(title, place, date);
+
+                // Проверяем результат операции
+                if (result != -1) {
+                    // Если мероприятие успешно добавлено, выведите сообщение об успехе
+                    Toast.makeText(AddEventActivity.this, "Мероприятие успешно добавлено!", Toast.LENGTH_SHORT).show();
+                    // Опционально: закройте текущую активность или выполните другие действия по желанию
+                    finish();
+                } else {
+                    // Если произошла ошибка при добавлении мероприятия, выведите сообщение об ошибке
+                    Toast.makeText(AddEventActivity.this, "Ошибка при добавлении мероприятия!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
     }
-
-    private void login(String username, String password) {
-        Result<LoggedInUser> result = loginRepository.login(username, password);
-        if (result instanceof Result.Success) {
-            LoggedInUser loggedInUser = ((Result.Success<LoggedInUser>) result).getData();
-            String userType = loggedInUser.getDisplayName().equals("admin") ? "admin" : "user";
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-            intent.putExtra("userType", userType);
-            startActivity(intent);
-            finish(); // Закрываем текущую активность, чтобы при возвращении на нее пользователь не мог вернуться к форме входа
-        } else if (result instanceof Result.Error) {
-            Exception error = ((Result.Error) result).getError();
-            Toast.makeText(this, "Ошибка входа в систему: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-        }
-    }
 }
 
 
@@ -346,251 +298,30 @@ public class LoginActivity extends AppCompatActivity {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginFormState.java
-package com.example.party6.ui.login;
-
-import androidx.annotation.Nullable;
-
-/**
- * Data validation state of the login form.
- */
-class LoginFormState {
-    @Nullable
-    private Integer usernameError;
-    @Nullable
-    private Integer passwordError;
-    private boolean isDataValid;
-
-    LoginFormState(@Nullable Integer usernameError, @Nullable Integer passwordError) {
-        this.usernameError = usernameError;
-        this.passwordError = passwordError;
-        this.isDataValid = false;
-    }
-
-    LoginFormState(boolean isDataValid) {
-        this.usernameError = null;
-        this.passwordError = null;
-        this.isDataValid = isDataValid;
-    }
-
-    @Nullable
-    Integer getUsernameError() {
-        return usernameError;
-    }
-
-    @Nullable
-    Integer getPasswordError() {
-        return passwordError;
-    }
-
-    boolean isDataValid() {
-        return isDataValid;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginResult.java
-package com.example.party6.ui.login;
-
-import androidx.annotation.Nullable;
-
-/**
- * Authentication result : success (user details) or error message.
- */
-class LoginResult {
-    @Nullable
-    private LoggedInUserView success;
-    @Nullable
-    private Integer error;
-
-    LoginResult(@Nullable Integer error) {
-        this.error = error;
-    }
-
-    LoginResult(@Nullable LoggedInUserView success) {
-        this.success = success;
-    }
-
-    @Nullable
-    LoggedInUserView getSuccess() {
-        return success;
-    }
-
-    @Nullable
-    Integer getError() {
-        return error;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginViewModel.java
-package com.example.party6.ui.login;
-
-import androidx.lifecycle.LiveData;
-import androidx.lifecycle.MutableLiveData;
-import androidx.lifecycle.ViewModel;
-
-import android.util.Patterns;
-
-import com.example.party6.data.LoginRepository;
-import com.example.party6.data.Result;
-import com.example.party6.data.model.LoggedInUser;
-import com.example.party6.R;
-
-public class LoginViewModel extends ViewModel {
-
-    private MutableLiveData<LoginFormState> loginFormState = new MutableLiveData<>();
-    private MutableLiveData<LoginResult> loginResult = new MutableLiveData<>();
-    private LoginRepository loginRepository;
-
-    LoginViewModel(LoginRepository loginRepository) {
-        this.loginRepository = loginRepository;
-    }
-
-    LiveData<LoginFormState> getLoginFormState() {
-        return loginFormState;
-    }
-
-    LiveData<LoginResult> getLoginResult() {
-        return loginResult;
-    }
-
-    public void login(String username, String password) {
-        // can be launched in a separate asynchronous job
-        Result<LoggedInUser> result = loginRepository.login(username, password);
-
-        if (result instanceof Result.Success) {
-            LoggedInUser data = ((Result.Success<LoggedInUser>) result).getData();
-            loginResult.setValue(new LoginResult(new LoggedInUserView(data.getDisplayName())));
-        } else {
-            loginResult.setValue(new LoginResult(R.string.login_failed));
-        }
-    }
-
-    public void loginDataChanged(String username, String password) {
-        if (!isUserNameValid(username)) {
-            loginFormState.setValue(new LoginFormState(R.string.invalid_username, null));
-        } else if (!isPasswordValid(password)) {
-            loginFormState.setValue(new LoginFormState(null, R.string.invalid_password));
-        } else {
-            loginFormState.setValue(new LoginFormState(true));
-        }
-    }
-
-    // A placeholder username validation check
-    private boolean isUserNameValid(String username) {
-        if (username == null) {
-            return false;
-        }
-        if (username.contains("@")) {
-            return Patterns.EMAIL_ADDRESS.matcher(username).matches();
-        } else {
-            return !username.trim().isEmpty();
-        }
-    }
-
-    // A placeholder password validation check
-    private boolean isPasswordValid(String password) {
-        return password != null && password.trim().length() > 5;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ui/login/LoginViewModelFactory.java
-package com.example.party6.ui.login;
-
-import android.content.Context;
-
-import androidx.lifecycle.ViewModel;
-import androidx.lifecycle.ViewModelProvider;
-import androidx.annotation.NonNull;
-
-import com.example.party6.data.LoginDataSource;
-import com.example.party6.data.LoginRepository;
-
-/**
- * ViewModel provider factory to instantiate LoginViewModel.
- * Required given LoginViewModel has a non-empty constructor
- */
-public class LoginViewModelFactory implements ViewModelProvider.Factory {
-
-    private final Context context; // Добавлено поле для хранения контекста
-
-    // Конструктор для получения контекста
-    public LoginViewModelFactory(Context context) {
-        this.context = context;
-    }
-
-    @NonNull
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends ViewModel> T create(@NonNull Class<T> modelClass) {
-        if (modelClass.isAssignableFrom(LoginViewModel.class)) {
-            // Передаем контекст вместе с LoginDataSource
-            return (T) new LoginViewModel(LoginRepository.getInstance(new LoginDataSource(), context));
-        } else {
-            throw new IllegalArgumentException("Unknown ViewModel class");
-        }
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/DBHelper.java
-// DBHelper.java
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/DBHelper.java
 package com.example.party6;
 
+import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.example.party6.NewsItem;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
-    private static final String DATABASE_NAME = "party6.db";
+
+    private static final String DATABASE_NAME = "party6_db";
     private static final int DATABASE_VERSION = 1;
+
+    private static final String TABLE_NAME = "events";
+    private static final String COLUMN_ID = "id";
+    private static final String COLUMN_TITLE = "title";
+    private static final String COLUMN_PLACE = "place";
+    private static final String COLUMN_DATE = "date";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -598,64 +329,64 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String sql = "CREATE TABLE users (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "username TEXT," +
-                "password TEXT)";
-        db.execSQL(sql);
-        // Вставляем тестовых пользователей
-        db.execSQL("INSERT INTO users (username, password) VALUES ('admin', 'password')");
-        db.execSQL("INSERT INTO users (username, password) VALUES ('user', 'password')");
-
-        // Создаем таблицу для новостей
-        db.execSQL("CREATE TABLE news (" +
-                "id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                "title TEXT," +
-                "place TEXT," +
-                "date TEXT)");
-        // Вставляем новости
-        db.execSQL("INSERT INTO news (title, place, date) VALUES ('Открытие SUBSIDIUM-23', 'КФЕН', '27 марта (Четверг) 18:00 ч')");
-        db.execSQL("INSERT INTO news (title, place, date) VALUES ('Посвящение первокурсников КИТ', 'КИТ', '27 сентября (Суббота) 17:00 ч')");
+        String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
+                + COLUMN_ID + " INTEGER PRIMARY KEY,"
+                + COLUMN_TITLE + " TEXT,"
+                + COLUMN_PLACE + " TEXT,"
+                + COLUMN_DATE + " TEXT"
+                + ")";
+        db.execSQL(CREATE_EVENTS_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS users");
-        db.execSQL("DROP TABLE IF EXISTS news");
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
         onCreate(db);
     }
 
-    public boolean checkUser(String username, String password) {
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM users WHERE username=? AND password=?", new String[]{username, password});
-        boolean userExists = cursor.getCount() > 0;
-        cursor.close();
-        return userExists;
+    public long addEvent(String title, String place, String date) {
+        SQLiteDatabase db = this.getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_TITLE, title);
+        values.put(COLUMN_PLACE, place);
+        values.put(COLUMN_DATE, date);
+        long result = db.insert(TABLE_NAME, null, values);
+        db.close();
+        return result;
     }
 
-    // Метод для получения всех новостей из базы данных
-    public List<NewsItem> getAllNews() {
-        List<NewsItem> newsList = new ArrayList<>();
-        SQLiteDatabase db = this.getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM news", null);
-        if (cursor.moveToFirst()) {
+    public List<NewsItem> getAllEvents() {
+        List<NewsItem> eventsList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_NAME;
+        SQLiteDatabase db = this.getWritableDatabase();
+        Cursor cursor = db.rawQuery(selectQuery, null);
+
+        if (cursor != null && cursor.moveToFirst()) {
             do {
-                NewsItem newsItem = new NewsItem();
-                int titleIndex = cursor.getColumnIndex("title");
-                int placeIndex = cursor.getColumnIndex("place");
-                int dateIndex = cursor.getColumnIndex("date");
-                if (titleIndex >= 0 && placeIndex >= 0 && dateIndex >= 0) {
-                    newsItem.setTitle(cursor.getString(titleIndex));
-                    newsItem.setPlace(cursor.getString(placeIndex));
-                    newsItem.setDate(cursor.getString(dateIndex));
-                    newsList.add(newsItem);
+                NewsItem event = new NewsItem();
+                int titleIndex = cursor.getColumnIndex(COLUMN_TITLE);
+                int placeIndex = cursor.getColumnIndex(COLUMN_PLACE);
+                int dateIndex = cursor.getColumnIndex(COLUMN_DATE);
+
+                if (titleIndex != -1) {
+                    event.setTitle(cursor.getString(titleIndex));
                 }
+                if (placeIndex != -1) {
+                    event.setPlace(cursor.getString(placeIndex));
+                }
+                if (dateIndex != -1) {
+                    event.setDate(cursor.getString(dateIndex));
+                }
+
+                eventsList.add(event);
             } while (cursor.moveToNext());
         }
-        cursor.close();
-        return newsList;
+        if (cursor != null) {
+            cursor.close();
+        }
+        db.close();
+        return eventsList;
     }
-
 }
 
 
@@ -669,7 +400,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/MainActivity.java
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/MainActivity.java
 package com.example.party6;
 
 import android.content.Intent;
@@ -679,12 +411,8 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import com.example.party6.DBHelper;
-import com.example.party6.NewsItem;
 
 import java.util.List;
 
@@ -714,9 +442,9 @@ public class MainActivity extends AppCompatActivity {
         // Отображаем новости в блоках новостей
         displayNews(newsList);
 
-        // Обработка нажатия на кнопку "Кнопка 5"
-        Button button5 = findViewById(R.id.button5);
-        button5.setOnClickListener(new View.OnClickListener() {
+        // Обработка нажатия на кнопку "Profile"
+        Button profileButton = findViewById(R.id.button5);
+        profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openProfileActivity();
@@ -740,7 +468,7 @@ public class MainActivity extends AppCompatActivity {
 
     private List<NewsItem> getNewsFromDatabase() {
         DBHelper dbHelper = new DBHelper(this);
-        return dbHelper.getAllNews();
+        return dbHelper.getAllEvents(); // Corrected method call to getAllEvents()
     }
 
     private void displayNews(List<NewsItem> newsList) {
@@ -770,13 +498,13 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Метод для открытия активности профиля
-    private void openProfileActivity() {
+    public void openProfileActivity() {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 
     // Метод для открытия активности добавления мероприятия
-    private void openAddEventActivity() {
+    public void openAddEventActivity() {
         Intent intent = new Intent(this, AddEventActivity.class);
         startActivity(intent);
     }
@@ -794,7 +522,223 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_login.xml
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/NewsItem.java
+// NewsItem.java
+package com.example.party6;
+
+public class NewsItem {
+    private String title;
+    private String place;
+    private String date;
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getPlace() {
+        return place;
+    }
+
+    public void setPlace(String place) {
+        this.place = place;
+    }
+
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/ProfileActivity.java
+package com.example.party6;
+
+import androidx.appcompat.app.AppCompatActivity;
+import android.os.Bundle;
+
+public class ProfileActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_profile);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/button_background.xml
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_pressed="true">
+        <shape android:shape="rectangle">
+            <solid android:color="#FF4081" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#00BCD4" />
+            <corners android:radius="8dp" />
+        </shape>
+    </item>
+</selector>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/news_background.xml
+<!-- news_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <gradient
+        android:startColor="#FF4081"
+        android:endColor="#00BCD4"
+        android:angle="135"/>
+    <corners android:radius="8dp"/>
+</shape>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/round_button.xml
+<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="@color/colorPrimary"/>
+    <corners android:radius="25dp"/>
+</shape>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/drawable/white_background.xml
+<!-- white_background.xml -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#FFFFFF"/> <!-- Белый цвет фона -->
+    <corners android:radius="8dp"/> <!-- Закругленные углы -->
+</shape>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_add_event.xml
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="16dp">
+
+    <EditText
+        android:id="@+id/eventTitleEditText"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Название мероприятия"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/eventPlaceEditText"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Место проведения"
+        android:layout_below="@id/eventTitleEditText"
+        android:layout_marginBottom="16dp"/>
+
+    <EditText
+        android:id="@+id/eventDateEditText"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:hint="Дата проведения"
+        android:layout_below="@id/eventPlaceEditText"
+        android:layout_marginBottom="16dp"/>
+
+
+    <Button
+        android:id="@+id/addEventButtonAddActivity"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/eventDateEditText"
+        android:layout_alignParentEnd="true"
+        android:text="Добавить мероприятие"/>
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_login.xml
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -880,7 +824,7 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_login.xml
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_main.xml
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -934,7 +878,8 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
         android:orientation="vertical"
         android:padding="16dp">
     </LinearLayout>
-    <!-- Добавляем контейнер для кнопок в нижней части экрана -->
+
+
     <LinearLayout
         android:id="@+id/bottomButtonContainer"
         android:layout_width="match_parent"
@@ -943,7 +888,7 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
         android:orientation="horizontal"
         android:gravity="center">
 
-        <!-- Первая кнопка -->
+
         <Button
             android:id="@+id/button1"
             android:layout_width="0dp"
@@ -951,7 +896,7 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
             android:layout_weight="1"
             android:text="Кнопка 1" />
 
-        <!-- Вторая кнопка -->
+
         <Button
             android:id="@+id/button2"
             android:layout_width="0dp"
@@ -959,7 +904,7 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
             android:layout_weight="1"
             android:text="Кнопка 2" />
 
-        <!-- Третья кнопка -->
+
         <Button
             android:id="@+id/button3"
             android:layout_width="0dp"
@@ -967,7 +912,7 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
             android:layout_weight="1"
             android:text="Кнопка 3" />
 
-        <!-- Четвертая кнопка -->
+
         <Button
             android:id="@+id/button4"
             android:layout_width="0dp"
@@ -975,7 +920,6 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
             android:layout_weight="1"
             android:text="Кнопка 4" />
 
-        <!-- Пятая кнопка -->
         <Button
             android:id="@+id/button5"
             android:layout_width="0dp"
@@ -983,9 +927,12 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
             android:layout_weight="1"
             android:text="Profile"
             android:background="@drawable/round_button"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:onClick="openProfileActivity" />
 
-        <!-- Кнопка для добавления мероприятий (для администратора) -->
+
+
+
         <Button
             android:id="@+id/addEventButton"
             android:layout_width="0dp"
@@ -1011,317 +958,7 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_main.xml
 
 
 
-File: C:/Users/apce1/Desktop/party6/build.gradle
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-plugins {
-    id 'com.android.application' version '7.4.1' apply false
-    id 'com.android.library' version '7.4.1' apply false
-}
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/build.gradle
-plugins {
-    id 'com.android.application'
-}
-
-android {
-    namespace 'com.example.party6'
-    compileSdkVersion 34
-
-    defaultConfig {
-        applicationId "com.example.party6"
-        minSdk 24
-        targetSdk 34
-        versionCode 1
-        versionName "1.0"
-
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
-
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    buildFeatures {
-        viewBinding true
-    }
-}
-
-dependencies {
-
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.11.0'
-    implementation 'androidx.annotation:annotation:1.7.1'
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
-    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
-    implementation 'androidx.sqlite:sqlite:2.1.0'
-
-    testImplementation 'junit:junit:4.13.2'
-    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-}
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/settings.gradle
-pluginManagement {
-    repositories {
-        google()
-        mavenCentral()
-        gradlePluginPortal()
-    }
-}
-dependencyResolutionManagement {
-    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
-    repositories {
-        google()
-        mavenCentral()
-    }
-}
-rootProject.name = "party6"
-include ':app'
-
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/AndroidManifest.xml
-<?xml version="1.0" encoding="utf-8"?>
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools">
-
-    <application
-        android:allowBackup="true"
-        android:dataExtractionRules="@xml/data_extraction_rules"
-        android:fullBackupContent="@xml/backup_rules"
-        android:icon="@mipmap/ic_launcher"
-        android:label="@string/app_name"
-        android:supportsRtl="true"
-        android:theme="@style/Theme.Party6"
-        tools:targetApi="31">
-
-        <activity
-            android:name=".ui.login.LoginActivity"
-            android:exported="true"> <!-- Устанавливаем android:exported="true" для LoginActivity -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <!-- Добавляем активность MainActivity -->
-        <activity android:name=".MainActivity" />
-
-    </application>
-
-</manifest>
-
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/news_background.xml
-<!-- news_background.xml -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <gradient
-        android:startColor="#FF4081"
-        android:endColor="#00BCD4"
-        android:angle="135"/>
-    <corners android:radius="8dp"/>
-</shape>
-
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/white_background.xml
-<!-- white_background.xml -->
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="#FFFFFF"/> <!-- Белый цвет фона -->
-    <corners android:radius="8dp"/> <!-- Закругленные углы -->
-</shape>
-
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/NewsItem.java
-// NewsItem.java
-package com.example.party6;
-
-public class NewsItem {
-    private String title;
-    private String place;
-    private String date;
-
-    public String getTitle() {
-        return title;
-    }
-
-    public void setTitle(String title) {
-        this.title = title;
-    }
-
-    public String getPlace() {
-        return place;
-    }
-
-    public void setPlace(String place) {
-        this.place = place;
-    }
-
-    public String getDate() {
-        return date;
-    }
-
-    public void setDate(String date) {
-        this.date = date;
-    }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/res/drawable/round_button.xml
-<?xml version="1.0" encoding="utf-8"?>
-<shape xmlns:android="http://schemas.android.com/apk/res/android"
-    android:shape="rectangle">
-    <solid android:color="@color/colorPrimary"/>
-    <corners android:radius="25dp"/>
-</shape>
-
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_add_news.xml
-<?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:padding="16dp">
-
-    <EditText
-        android:id="@+id/newsTitleEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Заголовок новости"
-        android:layout_marginBottom="16dp"/>
-
-    <EditText
-        android:id="@+id/newsPlaceEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Место проведения"
-        android:layout_below="@id/newsTitleEditText"
-        android:layout_marginBottom="16dp"/>
-
-    <EditText
-        android:id="@+id/newsDateEditText"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Дата проведения"
-        android:layout_below="@id/newsPlaceEditText"
-        android:layout_marginBottom="16dp"/>
-
-    <Button
-        android:id="@+id/addNewsButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/newsDateEditText"
-        android:layout_alignParentEnd="true"
-        android:text="Добавить новость"/>
-</RelativeLayout>
-
-
-
-
-
-
-
-
-
-
-
-
-
-File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_profile.xml
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_profile.xml
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
@@ -1391,20 +1028,117 @@ File: C:/Users/apce1/Desktop/party6/app/src/main/res/layout/activity_profile.xml
 
 
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/AddNewsActivity.java
-package com.example.party6;
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/values/colors.xml
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="purple_200">#FFBB86FC</color>
+    <color name="purple_500">#FF6200EE</color>
+    <color name="purple_700">#FF3700B3</color>
+    <color name="teal_200">#FF03DAC5</color>
+    <color name="teal_700">#FF018786</color>
+    <color name="black">#FF000000</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="colorPrimary">#2196F3</color>
+</resources>
 
-import androidx.appcompat.app.AppCompatActivity;
 
-import android.os.Bundle;
 
-public class AddNewsActivity extends AppCompatActivity {
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_news);
-    }
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/values/strings.xml
+<resources>
+    <string name="app_name">party6</string>
+    <!-- Strings related to login -->
+    <string name="prompt_email">Email</string>
+    <string name="prompt_password">Password</string>
+    <string name="action_sign_in">Sign in or register</string>
+    <string name="action_sign_in_short">Sign in</string>
+    <string name="welcome">"Welcome !"</string>
+    <string name="invalid_username">Not a valid username</string>
+    <string name="invalid_password">Password must be >5 characters</string>
+    <string name="login_failed">"Login failed"</string>
+</resources>
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/AndroidManifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    package="com.example.party6">
+
+    <uses-permission android:name="android.permission.INTERNET" />
+
+    <application
+        android:allowBackup="true"
+        android:dataExtractionRules="@xml/data_extraction_rules"
+        android:fullBackupContent="@xml/backup_rules"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.Party6"
+        tools:targetApi="31">
+
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".AddEventActivity" />
+
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="true"> <!-- Устанавливаем android:exported="true" для LoginActivity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Добавляем активность MainActivity -->
+        <activity
+            android:name=".MainActivity"
+            android:label="@string/app_name"
+            android:exported="true"> <!-- Устанавливаем android:exported="true" для MainActivity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+
+    </application>
+
+</manifest>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/build.gradle
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    id 'com.android.application' version '7.4.1' apply false
+    id 'com.android.library' version '7.4.1' apply false
 }
 
 
@@ -1418,18 +1152,51 @@ public class AddNewsActivity extends AppCompatActivity {
 
 
 
+File: C:/Users/apce1/Desktop/party7/androidParty/app/build.gradle
+plugins {
+    id 'com.android.application'
+}
 
-File: C:/Users/apce1/Desktop/party6/app/src/main/java/com/example/party6/ProfileActivity.java
-package com.example.party6;
+android {
+    namespace 'com.example.party6'
+    compileSdkVersion 34
 
-import androidx.appcompat.app.AppCompatActivity;
-import android.os.Bundle;
+    defaultConfig {
+        applicationId "com.example.party6"
+        minSdk 24
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
 
-public class ProfileActivity extends AppCompatActivity {
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_profile);
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    buildFeatures {
+        viewBinding true
+    }
+}
+
+dependencies {
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'com.google.android.material:material:1.11.0'
+    implementation 'androidx.annotation:annotation:1.7.1'
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.sqlite:sqlite:2.1.0'
+
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
