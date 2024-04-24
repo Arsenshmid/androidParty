@@ -1,4 +1,3 @@
-// NewsItem.java
 package com.example.party6;
 
 public class NewsItem {
@@ -6,6 +5,13 @@ public class NewsItem {
     private String place;
     private String date;
 
+    public NewsItem(String title, String place, String date) {
+        this.title = title;
+        this.place = place;
+        this.date = date;
+    }
+
+    // Геттеры и сеттеры для всех полей
     public String getTitle() {
         return title;
     }

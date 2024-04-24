@@ -307,21 +307,25 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.example.party6.NewsItem;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class DBHelper extends SQLiteOpenHelper {
 
-    private static final String DATABASE_NAME = "party6_db";
+    private static final String DATABASE_NAME = "PartyDB";
     private static final int DATABASE_VERSION = 1;
 
-    private static final String TABLE_NAME = "events";
-    private static final String COLUMN_ID = "id";
-    private static final String COLUMN_TITLE = "title";
-    private static final String COLUMN_PLACE = "place";
-    private static final String COLUMN_DATE = "date";
+    // Таблица событий
+    private static final String TABLE_EVENTS = "events";
+    private static final String KEY_ID = "id";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_PLACE = "place";
+    private static final String KEY_DATE = "date";
+
+    // Таблица аппаратуры
+    private static final String TABLE_EQUIPMENT = "equipment";
+    private static final String KEY_EQUIPMENT_ID = "id";
+    private static final String KEY_EQUIPMENT_NAME = "name";
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -329,63 +333,71 @@ public class DBHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_NAME + "("
-                + COLUMN_ID + " INTEGER PRIMARY KEY,"
-                + COLUMN_TITLE + " TEXT,"
-                + COLUMN_PLACE + " TEXT,"
-                + COLUMN_DATE + " TEXT"
-                + ")";
+        // Создание таблицы событий
+        String CREATE_EVENTS_TABLE = "CREATE TABLE " + TABLE_EVENTS + "("
+                + KEY_ID + " INTEGER PRIMARY KEY," + KEY_TITLE + " TEXT,"
+                + KEY_PLACE + " TEXT," + KEY_DATE + " TEXT" + ")";
         db.execSQL(CREATE_EVENTS_TABLE);
+
+        // Создание таблицы аппаратуры
+        String CREATE_EQUIPMENT_TABLE = "CREATE TABLE " + TABLE_EQUIPMENT + "("
+                + KEY_EQUIPMENT_ID + " INTEGER PRIMARY KEY," + KEY_EQUIPMENT_NAME + " TEXT" + ")";
+        db.execSQL(CREATE_EQUIPMENT_TABLE);
     }
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        db.execSQL("DROP TABLE IF EXISTS " + TABLE_NAME);
+        // Удаление старых таблиц и создание новых при обновлении БД
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EVENTS);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_EQUIPMENT);
         onCreate(db);
     }
 
-    public long addEvent(String title, String place, String date) {
+    // Добавление события в БД
+    public void addEvent(NewsItem newsItem) {
         SQLiteDatabase db = this.getWritableDatabase();
+
         ContentValues values = new ContentValues();
-        values.put(COLUMN_TITLE, title);
-        values.put(COLUMN_PLACE, place);
-        values.put(COLUMN_DATE, date);
-        long result = db.insert(TABLE_NAME, null, values);
+        values.put(KEY_TITLE, newsItem.getTitle());
+        values.put(KEY_PLACE, newsItem.getPlace());
+        values.put(KEY_DATE, newsItem.getDate());
+
+        db.insert(TABLE_EVENTS, null, values);
         db.close();
-        return result;
     }
 
+    // Получение всех событий из БД
     public List<NewsItem> getAllEvents() {
-        List<NewsItem> eventsList = new ArrayList<>();
-        String selectQuery = "SELECT * FROM " + TABLE_NAME;
+        List<NewsItem> eventList = new ArrayList<>();
+        String selectQuery = "SELECT * FROM " + TABLE_EVENTS;
+
         SQLiteDatabase db = this.getWritableDatabase();
         Cursor cursor = db.rawQuery(selectQuery, null);
 
-        if (cursor != null && cursor.moveToFirst()) {
+        if (cursor.moveToFirst()) {
             do {
-                NewsItem event = new NewsItem();
-                int titleIndex = cursor.getColumnIndex(COLUMN_TITLE);
-                int placeIndex = cursor.getColumnIndex(COLUMN_PLACE);
-                int dateIndex = cursor.getColumnIndex(COLUMN_DATE);
-
-                if (titleIndex != -1) {
-                    event.setTitle(cursor.getString(titleIndex));
-                }
-                if (placeIndex != -1) {
-                    event.setPlace(cursor.getString(placeIndex));
-                }
-                if (dateIndex != -1) {
-                    event.setDate(cursor.getString(dateIndex));
-                }
-
-                eventsList.add(event);
+                NewsItem newsItem = new NewsItem();
+                newsItem.setTitle(cursor.getString(1));
+                newsItem.setPlace(cursor.getString(2));
+                newsItem.setDate(cursor.getString(3));
+                eventList.add(newsItem);
             } while (cursor.moveToNext());
         }
-        if (cursor != null) {
-            cursor.close();
-        }
+
+        cursor.close();
         db.close();
-        return eventsList;
+        return eventList;
+    }
+
+    // Добавление аппаратуры в БД
+    public void addEquipment(String equipment) {
+        SQLiteDatabase db = this.getWritableDatabase();
+
+        ContentValues values = new ContentValues();
+        values.put(KEY_EQUIPMENT_NAME, equipment);
+
+        db.insert(TABLE_EQUIPMENT, null, values);
+        db.close();
     }
 }
 
@@ -459,6 +471,15 @@ public class MainActivity extends AppCompatActivity {
                 openAddEventActivity();
             }
         });
+
+        // Обработка нажатия на кнопку "Дневник"
+        Button diaryButton = findViewById(R.id.diaryButton);
+        diaryButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openEquipmentSelectionDialog();
+            }
+        });
     }
 
     private void setupAdminFeatures() {
@@ -468,19 +489,14 @@ public class MainActivity extends AppCompatActivity {
 
     private List<NewsItem> getNewsFromDatabase() {
         DBHelper dbHelper = new DBHelper(this);
-        return dbHelper.getAllEvents(); // Corrected method call to getAllEvents()
+        return dbHelper.getAllEvents();
     }
 
     private void displayNews(List<NewsItem> newsList) {
-        // Получаем ссылки на блоки новостей
         LinearLayout news1Layout = findViewById(R.id.news1Layout);
         LinearLayout news2Layout = findViewById(R.id.news2Layout);
-
-        // Очищаем предыдущие новости
         news1Layout.removeAllViews();
         news2Layout.removeAllViews();
-
-        // Перебираем список новостей и отображаем их в блоках новостей
         for (int i = 0; i < newsList.size(); i++) {
             NewsItem newsItem = newsList.get(i);
             TextView newsTextView = new TextView(this);
@@ -497,16 +513,26 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    // Метод для открытия активности профиля
     public void openProfileActivity() {
         Intent intent = new Intent(this, ProfileActivity.class);
         startActivity(intent);
     }
 
-    // Метод для открытия активности добавления мероприятия
     public void openAddEventActivity() {
         Intent intent = new Intent(this, AddEventActivity.class);
         startActivity(intent);
+    }
+
+    public void openEquipmentSelectionDialog() {
+        // Открываем диалог выбора аппаратуры
+        Intent intent = new Intent(this, EquipmentSelectionActivity.class);
+        startActivity(intent);
+    }
+
+    public void saveSelectedEquipment(String equipment) {
+        // Сохраняем выбранную аппаратуру в базу данных
+        DBHelper dbHelper = new DBHelper(this);
+        dbHelper.addEquipment(equipment);
     }
 }
 
@@ -879,7 +905,6 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activit
         android:padding="16dp">
     </LinearLayout>
 
-
     <LinearLayout
         android:id="@+id/bottomButtonContainer"
         android:layout_width="match_parent"
@@ -927,6 +952,27 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activit
             android:layout_marginBottom="8dp"/>
 
     </LinearLayout>
+
+    <!-- Кнопка Profile -->
+    <Button
+        android:id="@+id/button5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_button"
+        android:text="Profile"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center_horizontal" />
+
+    <!-- Кнопка Добавления мероприятия -->
+    <Button
+        android:id="@+id/addEventButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:background="@drawable/round_button"
+        android:text="+"
+        android:textColor="@android:color/white"
+        android:layout_gravity="center_horizontal" />
+
 </LinearLayout>
 
 
@@ -1066,6 +1112,7 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/AndroidManifest.xm
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.party6">
 
+    <!-- Разрешение на доступ к интернету -->
     <uses-permission android:name="android.permission.INTERNET" />
 
     <application
@@ -1078,26 +1125,27 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/AndroidManifest.xm
         android:theme="@style/Theme.Party6"
         tools:targetApi="31">
 
-        <activity android:name=".ProfileActivity" />
-        <activity android:name=".AddEventActivity" />
-
-        <activity
-            android:name=".ui.login.LoginActivity"
-            android:exported="true"> <!-- Устанавливаем android:exported="true" для LoginActivity -->
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-
-        <!-- Добавляем активность MainActivity -->
+        <!-- Активность MainActivity -->
         <activity
             android:name=".MainActivity"
             android:label="@string/app_name"
             android:exported="true"> <!-- Устанавливаем android:exported="true" для MainActivity -->
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-                <category android:name="android.intent.category.DEFAULT" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+
+        <!-- Другие активности -->
+        <activity android:name=".ProfileActivity" />
+        <activity android:name=".AddEventActivity" />
+        <activity
+            android:name=".ui.login.LoginActivity"
+            android:exported="true"> <!-- Устанавливаем android:exported="true" для LoginActivity -->
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
 
@@ -1197,8 +1245,173 @@ dependencies {
 
 File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_diary.xml
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/news_background"
+    tools:context=".DiaryActivity">
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+    <TextView
+        android:id="@+id/selectEquipmentText"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Выберите аппаратуру:"
+        android:textSize="18sp"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"/>
+
+    <RadioGroup
+        android:id="@+id/equipmentRadioGroup"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/selectEquipmentText"
+        android:layout_centerHorizontal="true"
+        android:orientation="vertical"
+        android:layout_marginTop="16dp">
+
+        <RadioButton
+            android:id="@+id/photoCameraRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Фотоаппарат" />
+
+        <RadioButton
+            android:id="@+id/tripodRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Штатив" />
+
+        <RadioButton
+            android:id="@+id/clipMicRadioButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Петличка" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/confirmButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Подтвердить"
+        android:layout_below="@id/equipmentRadioGroup"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="32dp"/>
+
+</RelativeLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/EquipmentSelectionActivity.java
+package com.example.party6;
+
+import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class EquipmentSelectionActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_equipment_selection);
+
+        // Находим радиогруппу и кнопку "Подтвердить"
+        RadioGroup equipmentRadioGroup = findViewById(R.id.equipmentRadioGroup);
+        Button confirmButton = findViewById(R.id.confirmButton);
+
+        // Обработчик нажатия на кнопку "Подтвердить"
+        confirmButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                // Получаем выбранный элемент из радиогруппы
+                int selectedId = equipmentRadioGroup.getCheckedRadioButtonId();
+                RadioButton selectedRadioButton = findViewById(selectedId);
+                String selectedEquipment = selectedRadioButton.getText().toString();
+
+                // Сохраняем выбранную аппаратуру
+                saveSelectedEquipment(selectedEquipment);
+
+                // Закрываем активность
+                finish();
+            }
+        });
+    }
+
+    // Метод для сохранения выбранной аппаратуры
+    private void saveSelectedEquipment(String equipment) {
+        MainActivity mainActivity = new MainActivity();
+        mainActivity.saveSelectedEquipment(equipment);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_equipment_selection.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <RadioGroup
+        android:id="@+id/equipmentRadioGroup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <RadioButton
+            android:id="@+id/photoCameraRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Фотоаппарат" />
+
+        <RadioButton
+            android:id="@+id/tripodRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Штатив" />
+
+        <RadioButton
+            android:id="@+id/necklaceRadioButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Петличка" />
+
+    </RadioGroup>
+
+    <Button
+        android:id="@+id/confirmButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Подтвердить"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"/>
+
+</LinearLayout>

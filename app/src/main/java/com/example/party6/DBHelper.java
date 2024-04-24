@@ -53,13 +53,13 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Добавление события в БД
-    public void addEvent(NewsItem newsItem) {
+    public void addEvent(String title, String place, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_TITLE, newsItem.getTitle());
-        values.put(KEY_PLACE, newsItem.getPlace());
-        values.put(KEY_DATE, newsItem.getDate());
+        values.put(KEY_TITLE, title);
+        values.put(KEY_PLACE, place);
+        values.put(KEY_DATE, date);
 
         db.insert(TABLE_EVENTS, null, values);
         db.close();
@@ -75,10 +75,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                NewsItem newsItem = new NewsItem();
-                newsItem.setTitle(cursor.getString(1));
-                newsItem.setPlace(cursor.getString(2));
-                newsItem.setDate(cursor.getString(3));
+                NewsItem newsItem = new NewsItem(cursor.getString(1), cursor.getString(2), cursor.getString(3));
                 eventList.add(newsItem);
             } while (cursor.moveToNext());
         }

@@ -28,18 +28,13 @@ public class AddEventActivity extends AppCompatActivity {
                 DBHelper dbHelper = new DBHelper(AddEventActivity.this);
 
                 // Добавляем новое мероприятие в базу данных
-                long result = dbHelper.addEvent(title, place, date);
+                dbHelper.addEvent(title, place, date);
 
-                // Проверяем результат операции
-                if (result != -1) {
-                    // Если мероприятие успешно добавлено, выведите сообщение об успехе
-                    Toast.makeText(AddEventActivity.this, "Мероприятие успешно добавлено!", Toast.LENGTH_SHORT).show();
-                    // Опционально: закройте текущую активность или выполните другие действия по желанию
-                    finish();
-                } else {
-                    // Если произошла ошибка при добавлении мероприятия, выведите сообщение об ошибке
-                    Toast.makeText(AddEventActivity.this, "Ошибка при добавлении мероприятия!", Toast.LENGTH_SHORT).show();
-                }
+                // Выводим сообщение об успешном добавлении мероприятия
+                Toast.makeText(AddEventActivity.this, "Мероприятие успешно добавлено!", Toast.LENGTH_SHORT).show();
+
+                // Закрываем текущую активность
+                finish();
             }
         });
     }
