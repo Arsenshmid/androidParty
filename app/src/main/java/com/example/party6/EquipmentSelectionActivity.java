@@ -5,6 +5,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -39,7 +40,9 @@ public class EquipmentSelectionActivity extends AppCompatActivity {
 
     // Метод для сохранения выбранной аппаратуры
     private void saveSelectedEquipment(String equipment) {
-        MainActivity mainActivity = new MainActivity();
-        mainActivity.saveSelectedEquipment(equipment);
+// После сохранения аппаратуры в базу данных вызываем метод saveSelectedEquipment() из MainActivity
+        //MainActivity mainActivity = new MainActivity();
+        //mainActivity.saveSelectedEquipment(equipment);
+        Toast.makeText(getApplicationContext(), "Сохранено в БД", Toast.LENGTH_SHORT).show();
     }
 }

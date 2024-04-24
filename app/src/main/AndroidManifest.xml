@@ -29,6 +29,8 @@
         <!-- Добавляем активность Дневник -->
         <activity android:name=".DiaryActivity"/>
         <activity android:name=".EquipmentSelectionActivity"/>
+        <activity android:name=".CalendarActivity" />
+        <activity android:name=".SettingsActivity" />
 
         <!-- Другие активности -->
         <activity android:name=".ProfileActivity" />

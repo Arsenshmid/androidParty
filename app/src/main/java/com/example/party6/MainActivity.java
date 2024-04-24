@@ -14,10 +14,20 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean isBlackBackground = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Button settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSettingsActivity();
+            }
+        });
 
         // Получение данных о пользователе из предыдущей активности
         Intent intent = getIntent();
@@ -62,6 +72,15 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 openEquipmentSelectionDialog();
+            }
+        });
+
+        // Обработка нажатия на кнопку "Календарь"
+        Button calendarButton = findViewById(R.id.calendarButton);
+        calendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCalendarActivity();
             }
         });
     }
@@ -113,9 +132,14 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void saveSelectedEquipment(String equipment) {
-        // Сохраняем выбранную аппаратуру в базу данных
-        DBHelper dbHelper = new DBHelper(this);
-        dbHelper.addEquipment(equipment);
+    public void openSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
+
+    public void openCalendarActivity() {
+        Intent intent = new Intent(this, CalendarActivity.class);
+        startActivity(intent);
+    }
+
 }

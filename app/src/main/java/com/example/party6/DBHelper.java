@@ -25,6 +25,7 @@ public class DBHelper extends SQLiteOpenHelper {
     private static final String TABLE_EQUIPMENT = "equipment";
     private static final String KEY_EQUIPMENT_ID = "id";
     private static final String KEY_EQUIPMENT_NAME = "name";
+    private static final String KEY_USER_TYPE = "user_type"; // Добавляем новый столбец для отслеживания пользователя
 
     public DBHelper(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -40,7 +41,8 @@ public class DBHelper extends SQLiteOpenHelper {
 
         // Создание таблицы аппаратуры
         String CREATE_EQUIPMENT_TABLE = "CREATE TABLE " + TABLE_EQUIPMENT + "("
-                + KEY_EQUIPMENT_ID + " INTEGER PRIMARY KEY," + KEY_EQUIPMENT_NAME + " TEXT" + ")";
+                + KEY_EQUIPMENT_ID + " INTEGER PRIMARY KEY," + KEY_EQUIPMENT_NAME + " TEXT,"
+                + KEY_USER_TYPE + " TEXT" + ")"; // Добавляем столбец для отслеживания пользователя
         db.execSQL(CREATE_EQUIPMENT_TABLE);
     }
 
@@ -86,13 +88,30 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Добавление аппаратуры в БД
-    public void addEquipment(String equipment) {
+    public void addEquipment(String equipment, String userType) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
         values.put(KEY_EQUIPMENT_NAME, equipment);
+        values.put(KEY_USER_TYPE, userType); // Сохраняем тип пользователя
 
         db.insert(TABLE_EQUIPMENT, null, values);
         db.close();
+    }
+
+    // Получение списка аппаратуры для указанного пользователя
+    public List<String> getEquipmentForUser(String userType) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        List<String> equipmentList = new ArrayList<>();
+        Cursor cursor = db.query(TABLE_EQUIPMENT, new String[]{KEY_EQUIPMENT_NAME}, KEY_USER_TYPE + "=?", new String[]{userType}, null, null, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String equipment = cursor.getString(cursor.getColumnIndex(KEY_EQUIPMENT_NAME));
+                equipmentList.add(equipment);
+            } while (cursor.moveToNext());
+        }
+        cursor.close();
+        db.close();
+        return equipmentList;
     }
 }

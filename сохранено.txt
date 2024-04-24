@@ -11,6 +11,72 @@
 
 
 
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_calendar.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:gravity="center"
+    android:padding="16dp">
+
+    <TextView
+        android:id="@+id/calendarTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Календарь"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <CalendarView
+        android:id="@+id/calendarView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"/>
+
+</LinearLayout>
+
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/CalendarActivity.java
+package com.example.party6;
+
+import android.os.Bundle;
+
+import androidx.appcompat.app.AppCompatActivity;
+
+public class CalendarActivity extends AppCompatActivity {
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_calendar);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/model/LoggedInUser.java
 package com.example.party6.data.model;
 
@@ -422,10 +488,20 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
+    private boolean isBlackBackground = false;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        Button settingsButton = findViewById(R.id.settingsButton);
+        settingsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openSettingsActivity();
+            }
+        });
 
         // Получение данных о пользователе из предыдущей активности
         Intent intent = getIntent();
@@ -472,6 +548,15 @@ public class MainActivity extends AppCompatActivity {
                 openEquipmentSelectionDialog();
             }
         });
+
+        // Обработка нажатия на кнопку "Календарь"
+        Button calendarButton = findViewById(R.id.calendarButton);
+        calendarButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openCalendarActivity();
+            }
+        });
     }
 
     private void setupAdminFeatures() {
@@ -483,6 +568,15 @@ public class MainActivity extends AppCompatActivity {
         DBHelper dbHelper = new DBHelper(this);
         return dbHelper.getAllEvents();
     }
+
+
+    public void saveSelectedEquipment(String equipment) {
+        // Сохраняем выбранную аппаратуру в базу данных
+        DBHelper dbHelper = new DBHelper(this);
+        dbHelper.addEquipment(equipment);
+    }
+
+
 
     private void displayNews(List<NewsItem> newsList) {
         LinearLayout news1Layout = findViewById(R.id.news1Layout);
@@ -521,11 +615,16 @@ public class MainActivity extends AppCompatActivity {
         startActivity(intent);
     }
 
-    public void saveSelectedEquipment(String equipment) {
-        // Сохраняем выбранную аппаратуру в базу данных
-        DBHelper dbHelper = new DBHelper(this);
-        dbHelper.addEquipment(equipment);
+    public void openSettingsActivity() {
+        Intent intent = new Intent(this, SettingsActivity.class);
+        startActivity(intent);
     }
+
+    public void openCalendarActivity() {
+        Intent intent = new Intent(this, CalendarActivity.class);
+        startActivity(intent);
+    }
+
 }
 
 
@@ -972,6 +1071,7 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activit
         android:textColor="@android:color/white"
         android:layout_gravity="center_horizontal" />
 
+
 </LinearLayout>
 
 
@@ -1134,8 +1234,11 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/AndroidManifest.xm
             </intent-filter>
         </activity>
 
-
+        <!-- Добавляем активность Дневник -->
         <activity android:name=".DiaryActivity"/>
+        <activity android:name=".EquipmentSelectionActivity"/>
+        <activity android:name=".CalendarActivity" />
+        <activity android:name=".SettingsActivity" />
 
         <!-- Другие активности -->
         <activity android:name=".ProfileActivity" />

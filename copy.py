@@ -3,8 +3,8 @@ import pyperclip
 
 # Список файлов для обработки
 files = [
-
-
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_calendar.xml',
+'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/CalendarActivity.java',
 'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/model/LoggedInUser.java',
 'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/model/LoginActivity.java',
 'C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/data/LoginDataSource.java',
