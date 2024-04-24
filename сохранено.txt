@@ -884,64 +884,47 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activit
         android:id="@+id/bottomButtonContainer"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:orientation="horizontal"
-        android:gravity="center">
-
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="16dp"
+        android:orientation="horizontal">
 
         <Button
-            android:id="@+id/button1"
+            android:id="@+id/calendarButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Кнопка 1" />
-
+            android:text="Календарь"
+            android:layout_marginEnd="8dp"
+            android:layout_marginBottom="8dp"/>
 
         <Button
-            android:id="@+id/button2"
+            android:id="@+id/diaryButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Кнопка 2" />
-
+            android:text="Дневник"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"/>
 
         <Button
-            android:id="@+id/button3"
+            android:id="@+id/settingsButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Кнопка 3" />
-
+            android:text="Настройки"
+            android:layout_marginEnd="8dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"/>
 
         <Button
-            android:id="@+id/button4"
+            android:id="@+id/profileButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="Кнопка 4" />
-
-        <Button
-            android:id="@+id/button5"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Profile"
-            android:background="@drawable/round_button"
-            android:textColor="@android:color/white"
-            android:onClick="openProfileActivity" />
-
-
-
-
-        <Button
-            android:id="@+id/addEventButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="+"
-            android:background="@drawable/round_button"
-            android:textColor="@android:color/white"
-            android:visibility="gone" />
+            android:text="Профиль пользователя"
+            android:layout_marginStart="8dp"
+            android:layout_marginBottom="8dp"/>
 
     </LinearLayout>
 </LinearLayout>
@@ -1200,3 +1183,22 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.5'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
 }
+
+
+
+
+
+
+
+
+
+
+
+
+File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activity_diary.xml
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+</androidx.constraintlayout.widget.ConstraintLayout>
