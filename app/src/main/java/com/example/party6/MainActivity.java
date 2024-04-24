@@ -1,4 +1,4 @@
-package com.example.party6;// В MainActivity.java
+package com.example.party6;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -7,13 +7,11 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.party6.DBHelper;
 import com.example.party6.NewsItem;
-import com.example.party6.ProfileActivity;
 
 import java.util.List;
 
@@ -43,12 +41,21 @@ public class MainActivity extends AppCompatActivity {
         // Отображаем новости в блоках новостей
         displayNews(newsList);
 
-        // Обработка нажатия на кнопку "Кнопка 5"
-        Button button5 = findViewById(R.id.button5);
-        button5.setOnClickListener(new View.OnClickListener() {
+        // Обработка нажатия на кнопку "Profile"
+        Button profileButton = findViewById(R.id.button5);
+        profileButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 openProfileActivity();
+            }
+        });
+
+        // Обработка нажатия на кнопку добавления мероприятия
+        Button addEventButton = findViewById(R.id.addEventButton);
+        addEventButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                openAddEventActivity();
             }
         });
     }
@@ -56,16 +63,6 @@ public class MainActivity extends AppCompatActivity {
     private void setupAdminFeatures() {
         Button addEventButton = findViewById(R.id.addEventButton);
         addEventButton.setVisibility(View.VISIBLE); // Показываем кнопку добавления мероприятий
-        addEventButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // Здесь можно добавить логику для добавления нового мероприятия в базу данных
-                Toast.makeText(MainActivity.this, "Добавление нового мероприятия", Toast.LENGTH_SHORT).show();
-                // После добавления мероприятия обновляем список новостей
-                List<NewsItem> updatedNewsList = getNewsFromDatabase();
-                displayNews(updatedNewsList);
-            }
-        });
     }
 
     private List<NewsItem> getNewsFromDatabase() {
@@ -100,8 +97,14 @@ public class MainActivity extends AppCompatActivity {
     }
 
     // Метод для открытия активности профиля
-    private void openProfileActivity() {
+    public void openProfileActivity() {
         Intent intent = new Intent(this, ProfileActivity.class);
+        startActivity(intent);
+    }
+
+    // Метод для открытия активности добавления мероприятия
+    public void openAddEventActivity() {
+        Intent intent = new Intent(this, AddEventActivity.class);
         startActivity(intent);
     }
 }

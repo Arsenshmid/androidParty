@@ -5,33 +5,35 @@
     android:padding="16dp">
 
     <EditText
-        android:id="@+id/newsTitleEditText"
+        android:id="@+id/eventTitleEditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Заголовок новости"
+        android:layout_height="48dp"
+        android:hint="Название мероприятия"
         android:layout_marginBottom="16dp"/>
 
     <EditText
-        android:id="@+id/newsPlaceEditText"
+        android:id="@+id/eventPlaceEditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="Место проведения"
-        android:layout_below="@id/newsTitleEditText"
+        android:layout_below="@id/eventTitleEditText"
         android:layout_marginBottom="16dp"/>
 
     <EditText
-        android:id="@+id/newsDateEditText"
+        android:id="@+id/eventDateEditText"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="48dp"
         android:hint="Дата проведения"
-        android:layout_below="@id/newsPlaceEditText"
+        android:layout_below="@id/eventPlaceEditText"
         android:layout_marginBottom="16dp"/>
+
 
     <Button
-        android:id="@+id/addNewsButton"
+        android:id="@+id/addEventButtonAddActivity"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/newsDateEditText"
+        android:layout_below="@id/eventDateEditText"
         android:layout_alignParentEnd="true"
-        android:text="Добавить новость"/>
+        android:text="Добавить мероприятие"/>
+
 </RelativeLayout>
