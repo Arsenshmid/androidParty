@@ -269,18 +269,13 @@ public class AddEventActivity extends AppCompatActivity {
                 DBHelper dbHelper = new DBHelper(AddEventActivity.this);
 
                 // Добавляем новое мероприятие в базу данных
-                long result = dbHelper.addEvent(title, place, date);
+                dbHelper.addEvent(title, place, date);
 
-                // Проверяем результат операции
-                if (result != -1) {
-                    // Если мероприятие успешно добавлено, выведите сообщение об успехе
-                    Toast.makeText(AddEventActivity.this, "Мероприятие успешно добавлено!", Toast.LENGTH_SHORT).show();
-                    // Опционально: закройте текущую активность или выполните другие действия по желанию
-                    finish();
-                } else {
-                    // Если произошла ошибка при добавлении мероприятия, выведите сообщение об ошибке
-                    Toast.makeText(AddEventActivity.this, "Ошибка при добавлении мероприятия!", Toast.LENGTH_SHORT).show();
-                }
+                // Выводим сообщение об успешном добавлении мероприятия
+                Toast.makeText(AddEventActivity.this, "Мероприятие успешно добавлено!", Toast.LENGTH_SHORT).show();
+
+                // Закрываем текущую активность
+                finish();
             }
         });
     }
@@ -354,13 +349,13 @@ public class DBHelper extends SQLiteOpenHelper {
     }
 
     // Добавление события в БД
-    public void addEvent(NewsItem newsItem) {
+    public void addEvent(String title, String place, String date) {
         SQLiteDatabase db = this.getWritableDatabase();
 
         ContentValues values = new ContentValues();
-        values.put(KEY_TITLE, newsItem.getTitle());
-        values.put(KEY_PLACE, newsItem.getPlace());
-        values.put(KEY_DATE, newsItem.getDate());
+        values.put(KEY_TITLE, title);
+        values.put(KEY_PLACE, place);
+        values.put(KEY_DATE, date);
 
         db.insert(TABLE_EVENTS, null, values);
         db.close();
@@ -376,10 +371,7 @@ public class DBHelper extends SQLiteOpenHelper {
 
         if (cursor.moveToFirst()) {
             do {
-                NewsItem newsItem = new NewsItem();
-                newsItem.setTitle(cursor.getString(1));
-                newsItem.setPlace(cursor.getString(2));
-                newsItem.setDate(cursor.getString(3));
+                NewsItem newsItem = new NewsItem(cursor.getString(1), cursor.getString(2), cursor.getString(3));
                 eventList.add(newsItem);
             } while (cursor.moveToNext());
         }
@@ -549,7 +541,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/java/com/example/party6/NewsItem.java
-// NewsItem.java
 package com.example.party6;
 
 public class NewsItem {
@@ -557,6 +548,13 @@ public class NewsItem {
     private String place;
     private String date;
 
+    public NewsItem(String title, String place, String date) {
+        this.title = title;
+        this.place = place;
+        this.date = date;
+    }
+
+    // Геттеры и сеттеры для всех полей
     public String getTitle() {
         return title;
     }
@@ -581,6 +579,7 @@ public class NewsItem {
         this.date = date;
     }
 }
+
 
 
 
@@ -1107,7 +1106,6 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/values/strings
 
 
 File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/AndroidManifest.xml
-<?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.party6">
@@ -1136,6 +1134,8 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/AndroidManifest.xm
             </intent-filter>
         </activity>
 
+
+        <activity android:name=".DiaryActivity"/>
 
         <!-- Другие активности -->
         <activity android:name=".ProfileActivity" />
@@ -1253,10 +1253,10 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activit
     tools:context=".DiaryActivity">
 
     <TextView
-        android:id="@+id/selectEquipmentText"
+        android:id="@+id/textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Выберите аппаратуру:"
+        android:text="Дневник"
         android:textSize="18sp"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="32dp"/>
@@ -1265,41 +1265,41 @@ File: C:/Users/apce1/Desktop/party7/androidParty/app/src/main/res/layout/activit
         android:id="@+id/equipmentRadioGroup"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/selectEquipmentText"
-        android:layout_centerHorizontal="true"
-        android:orientation="vertical"
-        android:layout_marginTop="16dp">
+        android:layout_below="@id/textView"
+    android:layout_centerHorizontal="true"
+    android:orientation="vertical"
+    android:layout_marginTop="16dp">
 
-        <RadioButton
-            android:id="@+id/photoCameraRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Фотоаппарат" />
-
-        <RadioButton
-            android:id="@+id/tripodRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Штатив" />
-
-        <RadioButton
-            android:id="@+id/clipMicRadioButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Петличка" />
-
-    </RadioGroup>
-
-    <Button
-        android:id="@+id/confirmButton"
+    <RadioButton
+        android:id="@+id/photoCameraRadioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Подтвердить"
-        android:layout_below="@id/equipmentRadioGroup"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="32dp"/>
+        android:text="Фотоаппарат" />
 
-</RelativeLayout>
+    <RadioButton
+        android:id="@+id/tripodRadioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Штатив" />
+
+    <RadioButton
+        android:id="@+id/clipMicRadioButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Петличка" />
+
+</RadioGroup>
+
+<Button
+android:id="@+id/confirmButton"
+android:layout_width="wrap_content"
+android:layout_height="wrap_content"
+android:text="Подтвердить"
+android:layout_below="@id/equipmentRadioGroup"
+android:layout_centerHorizontal="true"
+android:layout_marginTop="32dp"/>
+
+    </RelativeLayout>
 
 
 
